@@ -5,13 +5,14 @@ const jwt = require('jwt-simple');
 //
 // Encode (van username naar token)
 //
-function encodeToken(id, firstname, lastname) {
+function encodeToken(id, firstname, lastname, email) {
     const playload = {
         exp: moment().add(10, 'days').unix(),
         iat: moment().unix(),
         sub: id,
         firstname: firstname,
-        lastname: lastname
+        lastname: lastname,
+        email: email
     };
     return jwt.encode(playload, settings.secretkey);
 }

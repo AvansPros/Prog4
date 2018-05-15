@@ -8,3 +8,5 @@ class MaaltijdResponse {
         this.prijs = prijs;
     }
 }
+
+module.exports = MaaltijdResponse;

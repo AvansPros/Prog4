@@ -7,3 +7,5 @@ class StudentenhuisResponse {
         this.email = email;
     }
 }
+
+module.exports = StudentenhuisResponse;

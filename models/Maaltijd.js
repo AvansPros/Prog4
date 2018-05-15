@@ -7,3 +7,5 @@ class Maaltijd {
         this.prijs = prijs;
     }
 }
+
+module.exports = Maaltijd;

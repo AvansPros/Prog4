@@ -5,3 +5,5 @@ class DeelnemerResponse {
         this.email = email;
     }
 }
+
+module.exports = DeelnemerResponse;
