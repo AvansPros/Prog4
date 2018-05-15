@@ -1,0 +1,8 @@
+{
+    "secretkey" : "MyServerSuperSecretKey-123454321AbCd-",
+    "host"      : "188.166.109.108",
+    "user"      : "studentenhuis_user",
+    "password"  : "secret",
+    "database"  : "studentenhuis",
+    "port"      : "3000"
+}
