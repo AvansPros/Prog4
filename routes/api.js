@@ -1,7 +1,7 @@
+const db = require('../db/mysql-connector');
 const express = require('express');
 const router = express.Router();
 const auth =  require('../authentication');
-const db = require('../db/mysql-connector');
 var UserLoginJSON = require('../models/UserLoginJSON.js');
 var UserRegisterJSON = require('../models/UserRegisterJSON.js');
 var ValidToken = require('../models/ValidToken.js');
@@ -16,14 +16,13 @@ var DeelnemerResponse = require('../models/DeelnemerResponse');
 //Catch all except login and register
 router.all( new RegExp("^((?!login|register).)*$"), function (req, res, next) {
 
-    console.log("VALIDATE TOKEN")
 
     var token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
         if (err) {
-            console.log('Error handler: ' + err.message);
-            res.status((err.status || 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
+            //console.log('Error handler: ' + err.message);
+            res.status(( 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
         } else {
             next();
         }
@@ -87,7 +86,6 @@ router.route('/studentenhuis').post( function(req, res) {
             } else {
                 db.query('INSERT INTO studentenhuis SET ?', {Naam: studentenhuis.naam, Adres: studentenhuis.adres, UserID: payload.sub}, function (error, results, fields) {
                     if (error) throw error;
-                    console.log(results);
                     res.status(200).json(new StudentenhuisResponse(results.insertId, studentenhuis.naam, studentenhuis.adres, payload.firstname + " " + payload.lastname, payload.email));
                 });
             }
@@ -147,7 +145,6 @@ router.route('/studentenhuis/:huisId?').delete( function(req, res) {
         } else {
             db.query('SELECT * FROM studentenhuis WHERE ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
                 if (error) throw error;
-                console.log(results);
                 if(results[0]){
                     if (results[0].UserID == payload.sub){
                         db.query('DELETE FROM studentenhuis WHERE ID = ' + db.escape(req.params.huisId), function (error, results, fields) {

@@ -9,8 +9,6 @@ let db = mysql.createConnection( {
     insecureAuth : true
 });
 
-console.log(db.host);
-
 db.connect( (error) => {
     if(error) {
         console.log(error);
