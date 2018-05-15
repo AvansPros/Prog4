@@ -178,9 +178,8 @@ router.route('/studentenhuis/:huisId?/maaltijd').post( function(req, res) {
                 console.log('Error handler: ' + err.message);
                 res.status((err.status || 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
             } else {
-                db.query('INSERT INTO maaltijd SET ?', {Naam: maaltijd.naam, Beschrijving: maaltijd.beschrijving, Ingredienten: maaltijd.ingredienten, Allergie: maaltijd.allergie, Prijs: maaltijd.prijs, UserId: payload.id, StudentenhuisId: db.escape(req.params.huisId)}, function (error, results, fields) {
+                db.query('INSERT INTO maaltijd SET ?', {Naam: maaltijd.naam, Beschrijving: maaltijd.beschrijving, Ingredienten: maaltijd.ingredienten, Allergie: maaltijd.allergie, Prijs: maaltijd.prijs, UserID: payload.sub, StudentenhuisID: req.params.huisId}, function (error, results, fields) {
                     if (error) throw error;
-                    console.log(results);
                     res.status(200).json(new MaaltijdResponse(results.insertId, maaltijd.naam, maaltijd.beschrijving, maaltijd.ingredienten, maaltijd.allergie, maaltijd.prijs));
                 });
             }
@@ -257,30 +256,24 @@ router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?').delete( function(r
     });
 });
 
-//Deelnemer crud
+//Deelnemer CRUD
 
 router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers').post( function(req, res) {
-    // Get body params
-    var studentenhuis = new Studentenhuis(req.body.naam, req.body.adres)
 
-    if (studentenhuis.code){
-        res.status(412).json(studentenhuis);
-    }else{
-        var token = (req.header('X-Access-Token')) || '';
+    var token = (req.header('X-Access-Token')) || '';
 
-        auth.decodeToken(token, (err, payload) => {
-            if (err) {
-                console.log('Error handler: ' + err.message);
-                res.status((err.status || 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
-            } else {
-                db.query('INSERT INTO deelnemers SET ?', {UserID: payload.id, StudentenhuisID: db.escape(req.params.huisId), MaaltijdID: db.escape(req.params.maaltijdId)}, function (error, results, fields) {
-                    if (error) throw error;
-                    console.log(results);
-                    res.status(200).json(new DeelnemerResponse(payload.voornaam, payload.achternaam, payload.email));
-                });
-            }
-        });
-    }
+    auth.decodeToken(token, (err, payload) => {
+        if (err) {
+            console.log('Error handler: ' + err.message);
+            res.status((err.status || 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
+        } else {
+            db.query('INSERT IGNORE INTO deelnemers SET ?', {UserID: payload.sub, StudentenhuisID: req.params.huisId, MaaltijdID: req.params.maaltijdId}, function (error, results, fields) {
+                if (error) throw error;
+                res.status(200).json(new DeelnemerResponse(payload.firstname, payload.lastname, payload.email));
+            });
+        }
+    });
+
 });
 
 router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
@@ -301,13 +294,13 @@ router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers').delete(
             console.log('Error handler: ' + err.message);
             res.status((err.status || 401 )).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
         } else {
-            db.query('SELECT * FROM deelnemers WHERE ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
+            db.query('SELECT * FROM deelnemers WHERE StudentenhuisID = ' + db.escape(req.params.huisId) + " AND MaaltijdID = " + db.escape(req.params.maaltijdId), function (error, results, fields) {
                 if (error) throw error;
                 console.log(results);
                 if(results[0]){
                     if (results[0].UserID == payload.sub){
-                        db.query('DELETE FROM deelnemers WHERE userID = ' + db.escape(req.payload.id) + ' AND maaltijdID = ' + db.escape(req.params.maaltijdId) + ' AND studentenhuisID = ' + db.escape(req.params.huisId), function (error, results, fields) {
-                            res.status(200).json("Deletion of deelnemer " + req.params.huisId + " was successful");
+                        db.query('DELETE FROM deelnemers WHERE userID = ' + db.escape(payload.sub) + ' AND maaltijdID = ' + db.escape(req.params.maaltijdId) + ' AND studentenhuisID = ' + db.escape(req.params.huisId), function (error, results, fields) {
+                            res.status(200).json("Deletion of deelnemer " + payload.sub + " for studentenhuis" + req.params.huisId + " and maaltijd " + req.params.maaltijdId +  " was successful");
                         });
                     } else {
                         res.status(409).json(new ApiError("Conflict (Gebruiker mag deze data niet verwijderen)", 409));
