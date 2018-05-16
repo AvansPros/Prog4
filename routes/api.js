@@ -51,20 +51,24 @@ router.route('/register').post( function(req, res) {
     // Get body params
     var userRegister = new UserRegisterJSON(req.body.firstname, req.body.lastname, req.body.email, req.body.password)
 
-    // Check in datasource for user & password combo.
-    db.query('SELECT * FROM user WHERE Email = ' + db.escape(userRegister.email), (error, results, fields) => {
-        if (error) throw error;
+    if (userRegister.code){
+        res.status(412).json(userRegister);
+    }else{
+        // Check in datasource if user already exists.
+        db.query('SELECT * FROM user WHERE Email = ' + db.escape(userRegister.email), (error, results, fields) => {
+            if (error) throw error;
 
-        if( results[0] ) {
-            res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
-        } else {
-            db.query('INSERT INTO user SET ?', {Voornaam: userRegister.firstname, Achternaam: userRegister.lastname, Email: userRegister.email, Password: userRegister.password}, function (error, results, fields) {
-                if (error) throw error;
-                console.log(results);
-                res.status(200).json(new ValidToken(auth.encodeToken(results.insertId, userRegister.firstname, userRegister.lastname, userRegister.email), userRegister.email));
-            });
-        }
-    });
+            if( results[0] ) {
+                res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
+            } else {
+                db.query('INSERT INTO user SET ?', {Voornaam: userRegister.firstname, Achternaam: userRegister.lastname, Email: userRegister.email, Password: userRegister.password}, function (error, results, fields) {
+                    if (error) throw error;
+                    console.log(results);
+                    res.status(200).json(new ValidToken(auth.encodeToken(results.insertId, userRegister.firstname, userRegister.lastname, userRegister.email), userRegister.email));
+                });
+            }
+        });
+    }
 });
 
 
