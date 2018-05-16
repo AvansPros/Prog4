@@ -12,30 +12,6 @@
 // //Our parent block
 // describe('Studentenhuis', () => {
 
-//     describe('/POST studentenhuis with token and request body', () => {
-//         it('it should POST one studentenhuizen and add it to the db', (done) => {
-//             chai.request(server)
-//             .post('/api/login')
-//             .send({email : "jsmit@server.nl", password : "secret"})
-//             .end((err, res) => {
-//                 chai.request(server)
-//                 .post('/api/studentenhuis')
-//                 .send({naam : "Kelvin's Huis", adres : "secret"})
-//                 .set("X-Access-Token", res.body.token)
-//                 .end((err, res) => {
-//                     res.should.have.status(200);
-//                     res.body.should.be.a('object');
-//                     res.body.naam.should.be.eql("Kelvin's Huis");
-//                     res.body.adres.should.be.eql("secret");
-//                     db.query("SELECT * FROM studentenhuis WHERE Naam = " + db.escape("Kelvin's Huis"), (error, results, fields) => {
-//                         results.length.should.be.above(0);
-//                         done();
-//                     });
-//                 });
-//             });
-//         });
-//     });
-
 //     //Test the /GET route
 //     describe('/GET studentenhuis without token', () => {
 //         it('it should deny access', (done) => {
@@ -90,23 +66,18 @@
 
 //     describe('/PUT studentenhuis with token', () => {
 //         it('it should PUT one studentenhuizen and update its values in the db', (done) => {
-//             chai.request(server)
-//             .post('/api/login')
-//             .send({email : "jsmit@server.nl", password : "secret"})
-//             .end((err, res) => {
-//                 db.query("SELECT ID FROM studentenhuis WHERE Naam = " + db.escape("Kelvin's Huis"), (error, results, fields) => {
-//                     chai.request(server)
-//                     .put('/api/studentenhuis/' + results[0].ID)
-//                     .send({naam : "Kelvin's Huis", adres : "secret2"})
-//                     .set("X-Access-Token", res.body.token)
-//                     .end((err, res) => {
-//                         res.should.have.status(200);
-//                         res.body.should.be.a('object');
-//                         db.query("SELECT * FROM studentenhuis WHERE Naam =  " + db.escape("Kelvin's Huis"), (error, results, fields) => {
-//                             results.length.should.be.eql(1);
-//                             results[0].Adres.should.be.eql("secret2");
-//                             done();
-//                         });
+//             db.query("SELECT ID FROM studentenhuis WHERE Naam = " + db.escape("Kelvin's Huis"), (error, results, fields) => {
+//                 chai.request(server)
+//                 .put('/api/studentenhuis/' + results[0].ID)
+//                 .send({naam : "Kelvin's Huis", adres : "secret2"})
+//                 .set("X-Access-Token", require("./authentication.routes.test"))
+//                 .end((err, res) => {
+//                     res.should.have.status(200);
+//                     res.body.should.be.a('object');
+//                     db.query("SELECT * FROM studentenhuis WHERE Naam =  " + db.escape("Kelvin's Huis"), (error, results, fields) => {
+//                         results.length.should.be.eql(1);
+//                         results[0].Adres.should.be.eql("secret2");
+//                         done();
 //                     });
 //                 });
 //             });

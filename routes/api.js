@@ -57,7 +57,6 @@ router.route('/register').post( function(req, res) {
         // Check in datasource if user already exists.
         db.query('SELECT * FROM user WHERE Email = ' + db.escape(userRegister.email), (error, results, fields) => {
             if (error) throw error;
-
             if( results[0] ) {
                 res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
             } else {
@@ -105,7 +104,7 @@ router.get('/studentenhuis', function(req, res, next) {
 });
 
 router.get('/studentenhuis/:huisId?', function(req, res, next) {
-    db.query('SELECT * FROM view_studentenhuis WHERE studentenhuis.ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
+    db.query('SELECT * FROM view_studentenhuis WHERE ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
         if (error) throw error;
         res.json(results[0]);
       });
