@@ -29,7 +29,7 @@ describe('Registration', () => {
         chai.request(server)
         .get('/api/register')
         .end((err, res) => {
-            //res.should.have.status(412);
+            res.should.have.status(500);
             done();
         });
     })
@@ -98,31 +98,43 @@ describe('Registration', () => {
 describe('Login', () => {
 
     it('should return a token when providing valid information', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+        .post('/api/login')
+        .send({email : "ks@server.nl", password : "secret"})
+        .end((err, res) => {
+            res.should.have.status(200);
+            done();
+        });
     })
 
     it('should throw an error when email does not exist', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+        .post('/api/login')
+        .send({email : "kss@server.nl", password : "secret"})
+        .end((err, res) => {
+            res.should.have.status(412);
+            done();
+        });
     })
 
     it('should throw an error when email exists but password is invalid', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+        .post('/api/login')
+        .send({email : "ks@server.nl", password : "secret1"})
+        .end((err, res) => {
+            res.should.have.status(412);
+            done();
+        });
     })
 
     it('should throw an error when using an invalid email', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+        .post('/api/login')
+        .send({email : "kssserver.nl", password : "secret"})
+        .end((err, res) => {
+            res.should.have.status(412);
+            done();
+        });
     })
 
     after(function() {
