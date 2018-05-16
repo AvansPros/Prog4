@@ -137,7 +137,7 @@ describe('Login', () => {
         });
     })
 
-    after(function() {
-        db.query('DELETE FROM user WHERE Email = ' + db.escape("ks@server.nl"));
-    });
+    // after(function() {
+    //     db.query('DELETE FROM user WHERE Email = ' + db.escape("ks@server.nl"));
+    // });
 })
