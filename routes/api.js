@@ -94,14 +94,14 @@ router.route('/studentenhuis').post( function(req, res) {
 });
 
 router.get('/studentenhuis', function(req, res, next) {
-    db.query('SELECT studentenhuis.ID, studentenhuis.Naam, studentenhuis.Adres, CONCAT(user.Voornaam, " ", user.Achternaam) as Contact, user.Email FROM studentenhuis LEFT JOIN user ON studentenhuis.UserID = user.ID', function (error, results, fields) {
+    db.query('SELECT * FROM view_studentenhuis', function (error, results, fields) {
         if (error) throw error;
         res.json(results);
       });
 });
 
 router.get('/studentenhuis/:huisId?', function(req, res, next) {
-    db.query('SELECT studentenhuis.ID, studentenhuis.Naam, studentenhuis.Adres, CONCAT(user.Voornaam, " ", user.Achternaam) as Contact, user.Email FROM studentenhuis LEFT JOIN user ON studentenhuis.UserID = user.ID WHERE studentenhuis.ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
+    db.query('SELECT * FROM view_studentenhuis WHERE studentenhuis.ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
         if (error) throw error;
         res.json(results[0]);
       });
