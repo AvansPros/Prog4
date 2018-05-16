@@ -51,20 +51,24 @@ router.route('/register').post( function(req, res) {
     // Get body params
     var userRegister = new UserRegisterJSON(req.body.firstname, req.body.lastname, req.body.email, req.body.password)
 
-    // Check in datasource for user & password combo.
-    db.query('SELECT * FROM user WHERE Email = ' + db.escape(userRegister.email), (error, results, fields) => {
-        if (error) throw error;
+    if (userRegister.code){
+        res.status(412).json(userRegister);
+    }else{
+        // Check in datasource if user already exists.
+        db.query('SELECT * FROM user WHERE Email = ' + db.escape(userRegister.email), (error, results, fields) => {
+            if (error) throw error;
 
-        if( results[0] ) {
-            res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
-        } else {
-            db.query('INSERT INTO user SET ?', {Voornaam: userRegister.firstname, Achternaam: userRegister.lastname, Email: userRegister.email, Password: userRegister.password}, function (error, results, fields) {
-                if (error) throw error;
-                console.log(results);
-                res.status(200).json(new ValidToken(auth.encodeToken(results.insertId, userRegister.firstname, userRegister.lastname, userRegister.email), userRegister.email));
-            });
-        }
-    });
+            if( results[0] ) {
+                res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
+            } else {
+                db.query('INSERT INTO user SET ?', {Voornaam: userRegister.firstname, Achternaam: userRegister.lastname, Email: userRegister.email, Password: userRegister.password}, function (error, results, fields) {
+                    if (error) throw error;
+                    console.log(results);
+                    res.status(200).json(new ValidToken(auth.encodeToken(results.insertId, userRegister.firstname, userRegister.lastname, userRegister.email), userRegister.email));
+                });
+            }
+        });
+    }
 });
 
 
@@ -94,14 +98,14 @@ router.route('/studentenhuis').post( function(req, res) {
 });
 
 router.get('/studentenhuis', function(req, res, next) {
-    db.query('SELECT studentenhuis.ID, studentenhuis.Naam, studentenhuis.Adres, CONCAT(user.Voornaam, " ", user.Achternaam) as Contact, user.Email FROM studentenhuis LEFT JOIN user ON studentenhuis.UserID = user.ID', function (error, results, fields) {
+    db.query('SELECT * FROM view_studentenhuis', function (error, results, fields) {
         if (error) throw error;
         res.json(results);
       });
 });
 
 router.get('/studentenhuis/:huisId?', function(req, res, next) {
-    db.query('SELECT studentenhuis.ID, studentenhuis.Naam, studentenhuis.Adres, CONCAT(user.Voornaam, " ", user.Achternaam) as Contact, user.Email FROM studentenhuis LEFT JOIN user ON studentenhuis.UserID = user.ID WHERE studentenhuis.ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
+    db.query('SELECT * FROM view_studentenhuis WHERE studentenhuis.ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
         if (error) throw error;
         res.json(results[0]);
       });
