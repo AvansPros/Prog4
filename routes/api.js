@@ -22,7 +22,7 @@ router.all(new RegExp("^((?!login|register).)*$"), function (req, res, next) {
 
     auth.decodeToken(token, (err, payload) => {
         if (err) {
-            //console.log('Error handler: ' + err.message);
+            console.log('Error handler: ' + err.message);
             res.status((401)).json(new ApiError("Niet geautoriseerd (geen valid token)", 401));
         } else {
             next();
@@ -70,7 +70,6 @@ router.route('/register').post(function (req, res) {
                 bcrypt.hash(userRegister.password, saltRounds, function (err, hash) {
                     db.query('INSERT INTO user SET ?', { Voornaam: userRegister.firstname, Achternaam: userRegister.lastname, Email: userRegister.email, Password: hash }, function (error, results, fields) {
                         if (error) throw error;
-                        console.log(results);
                         res.status(200).json(new ValidToken(auth.encodeToken(results.insertId, userRegister.firstname, userRegister.lastname, userRegister.email), userRegister.email));
                     });
                 });
@@ -140,7 +139,6 @@ router.route('/studentenhuis/:huisId?').put(function (req, res) {
             } else {
                 db.query('UPDATE studentenhuis SET ? WHERE ID = ' + db.escape(req.params.huisId), { Naam: studentenhuis.naam, Adres: studentenhuis.adres, UserID: payload.sub }, function (error, results, fields) {
                     if (error) throw error;
-                    console.log(results);
                     res.status(200).json(new StudentenhuisResponse(req.params.huisId, studentenhuis.naam, studentenhuis.adres, payload.firstname + " " + payload.lastname, payload.email));
                 });
             }
@@ -234,7 +232,6 @@ router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?').put(function (req,
             } else {
                 db.query('UPDATE maaltijd SET ? WHERE ID = ' + db.escape(req.params.maaltijdId), { Naam: maaltijd.naam, Beschrijving: maaltijd.beschrijving, Ingredienten: maaltijd.ingredienten, Allergie: maaltijd.allergie, Prijs: maaltijd.prijs }, function (error, results, fields) {
                     if (error) throw error;
-                    console.log(results);
                     res.status(200).json(new MaaltijdResponse(req.params.maaltijdId, maaltijd.naam, maaltijd.beschrijving, maaltijd.ingredienten, maaltijd.allergie, maaltijd.prijs));
                 });
             }
@@ -255,7 +252,6 @@ router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?').delete(function (r
         } else {
             db.query('SELECT * FROM maaltijd WHERE ID = ' + db.escape(req.params.maaltijdId), function (error, results, fields) {
                 if (error) throw error;
-                console.log(results);
                 if (results[0]) {
                     if (results[0].UserID == payload.sub) {
                         db.query('DELETE FROM maaltijd WHERE ID = ' + db.escape(req.params.maaltijdId), function (error, results, fields) {
@@ -312,7 +308,6 @@ router.route('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers').delete(
         } else {
             db.query('SELECT * FROM deelnemers WHERE StudentenhuisID = ' + db.escape(req.params.huisId) + " AND MaaltijdID = " + db.escape(req.params.maaltijdId), function (error, results, fields) {
                 if (error) throw error;
-                console.log(results);
                 if (results[0]) {
                     if (results[0].UserID == payload.sub) {
                         db.query('DELETE FROM deelnemers WHERE userID = ' + db.escape(payload.sub) + ' AND maaltijdID = ' + db.escape(req.params.maaltijdId) + ' AND studentenhuisID = ' + db.escape(req.params.huisId), function (error, results, fields) {

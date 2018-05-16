@@ -204,6 +204,7 @@ describe('Studentenhuis API DELETE', () => {
 
 })
 after(function (done) {
+    //make sure to remove test data at the end
     db.query('DELETE FROM studentenhuis WHERE Naam = ' + db.escape("Kelvin's Huis"), (error, results, fields) => {
         db.query('DELETE FROM user WHERE Email = ' + db.escape("ks@server.nl"), (error, results, fields) => {
             done();
