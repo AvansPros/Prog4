@@ -106,7 +106,11 @@ router.get('/studentenhuis', function(req, res, next) {
 router.get('/studentenhuis/:huisId?', function(req, res, next) {
     db.query('SELECT * FROM view_studentenhuis WHERE ID = ' + db.escape(req.params.huisId), function (error, results, fields) {
         if (error) throw error;
-        res.json(results[0]);
+        if (results[0]){
+            res.json(results[0]);
+        } else {
+            res.status(412).json(new ApiError("Een of meer properties in de request body ontbreken of zijn foutief", 412));
+        }
       });
 });
 
